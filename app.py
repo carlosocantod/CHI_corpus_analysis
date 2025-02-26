@@ -53,5 +53,5 @@ def main():
         st.dataframe(metadata_display, height=700)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
