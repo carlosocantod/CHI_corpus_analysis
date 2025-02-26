@@ -1,0 +1,5 @@
+xlrd
+# TODO: add specific versions of the packages
+sentence-transformers
+# see https://pytorch.org/get-started/locally/
+torch
