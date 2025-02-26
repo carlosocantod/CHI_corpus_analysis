@@ -1,6 +1,6 @@
 from pathlib import Path
 
-PATH_DATA = Path.home() / "git_repos" / "CHI_corpus_analysis" / "data"
+PATH_DATA = Path.home() / "Downloads"
 PATH_RAW_CHI_METADATA = PATH_DATA / "CHI_raw.xls"
 PATH_CLEAN_CHI_METADATA = PATH_DATA / "CHI_filtered.csv"
 PATH_EMBEDDINGS = PATH_DATA / "embeddings.csv"

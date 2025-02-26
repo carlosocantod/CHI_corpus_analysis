@@ -17,7 +17,7 @@ from settings import SBERT_MODEL_NAME
 st.set_page_config(
     page_title=APP_NAME,
     page_icon="🏗️",
-    # layout="wide",
+    layout="wide",
     initial_sidebar_state="expanded",
 )
 
@@ -51,12 +51,9 @@ def main():
     input_text = st.text_input(label="input_text", value=DEFAULT_QUERY)
     input_embeddings = model.encode([input_text], show_progress_bar=False)
     similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=COL_DOI).to_numpy()).ravel()
-    embeddings_aux = embeddings[[COL_DOI]].copy()
-    embeddings_aux[COL_COSINE_SIMILARITY] = similarity_scores
-    metadata = metadata.merge(embeddings_aux, on=COL_DOI, how="inner")
+    metadata[COL_COSINE_SIMILARITY] = similarity_scores
     metadata_display = metadata.sort_values(COL_COSINE_SIMILARITY, ascending=False, ignore_index=True)
     metadata_display = metadata_display[metadata_display[COL_COSINE_SIMILARITY] >= min_score].iloc[: number_of_results]
-    metadata_display.index += 1
     st.text(f"Number of results for this query above threshold {len(metadata_display)}")
     if len(metadata_display) > 0:
         st.dataframe(metadata_display, height=700)
