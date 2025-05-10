@@ -4,17 +4,18 @@ Simple streamlit application for querying CHI papers database
 import pandas as pd
 import streamlit as st
 from pandera import check_types
+from pandera.typing import DataFrame
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_models import Embeddings
-from data_models import Metadata, MetadataWithScore
+from data_models import MetadataWithPositions
+from data_models import MetadataWithScore
 from settings import APP_NAME
 from settings import DEFAULT_QUERY
-from settings import PATH_CLEAN_CHI_METADATA
+from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
-from pandera.typing import DataFrame
 
 st.set_page_config(
     page_title=APP_NAME,
@@ -26,14 +27,14 @@ st.set_page_config(
 
 @check_types()
 @st.cache_data()
-def load_data() -> tuple[SentenceTransformer, DataFrame[Embeddings], DataFrame[Metadata]]:
+def load_data() -> tuple[SentenceTransformer, DataFrame[Embeddings], DataFrame[MetadataWithPositions]]:
     """
     Load heavy items only once then cache
     :return: model, embeddings, metadata
     """
     model = SentenceTransformer(SBERT_MODEL_NAME)
     embeddings = pd.read_parquet(PATH_EMBEDDINGS)
-    metadata = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
+    metadata = pd.read_parquet(PATH_CLEAN_CHI_METADATA_POSITIONS)
     return model, embeddings, metadata
 
 

@@ -4,13 +4,19 @@ Created on Tue Dec 20 15:34:41 2022
 @author: carlos
 """
 import pandas as pd
+from pacmap import PaCMAP
+from sklearn.preprocessing import StandardScaler
 
 from data_models import Embeddings
 from data_models import Metadata
+from data_models import MetadataWithPositions
 from settings import PATH_CLEAN_CHI_METADATA
+from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
+from settings import PATH_EMBEDDINGS_10d
 from settings import PATH_RAW_CHI_METADATA
 from settings import SBERT_MODEL_NAME
+from utils import get_embeddings_from_dataframe
 
 
 def main() -> None:
@@ -40,6 +46,24 @@ def main() -> None:
         df_embeddings[Embeddings.doi] = df_text[Metadata.doi]
         Embeddings.validate(df_embeddings, inplace=True)
         df_embeddings.to_parquet(PATH_EMBEDDINGS, index=False)
+
+    if not PATH_EMBEDDINGS_10d.is_file():
+        df_embeddings = pd.read_parquet(PATH_EMBEDDINGS)
+        df_text = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
+
+        _input_embeddings_to_scale = StandardScaler().fit_transform(get_embeddings_from_dataframe(df_embeddings))
+
+        dim_reduction_cluster = PaCMAP(n_components=10, random_state=0)
+        embeddings_10d = pd.DataFrame(dim_reduction_cluster.fit_transform(X=_input_embeddings_to_scale))
+        embeddings_10d[Embeddings.doi] = df_embeddings[Embeddings.doi]
+        embeddings_10d.to_parquet(PATH_EMBEDDINGS_10d, index=False)
+
+        dim_reduction_visu = PaCMAP(n_components=2, random_state=0)
+        df_text[[MetadataWithPositions.x, MetadataWithPositions.y]] = pd.DataFrame(
+            dim_reduction_visu.fit_transform(X=get_embeddings_from_dataframe(embeddings_10d))
+        )
+        MetadataWithPositions.validate(df_text, inplace=True)
+        df_text.to_parquet(PATH_CLEAN_CHI_METADATA_POSITIONS, index=False)
 
 
 if __name__ == "__main__":

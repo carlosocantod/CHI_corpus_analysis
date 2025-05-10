@@ -33,7 +33,12 @@ class Metadata(_DOI):
     scholar_link: str = CheckNameField()
 
 
-class MetadataWithScore(_DOI):
+class MetadataWithPositions(Metadata):
+    x: float = CheckNameField()
+    y: float = CheckNameField()
+
+
+class MetadataWithScore(MetadataWithPositions):
     score: float = CheckNameField(le=-1.0, ge=1.0)
 
 
