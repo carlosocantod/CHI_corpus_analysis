@@ -2,6 +2,7 @@
 Simple streamlit application for querying CHI papers database
 """
 import pandas as pd
+import plotly.express as px
 import streamlit as st
 from pandera import check_types
 from pandera.typing import DataFrame
@@ -16,7 +17,6 @@ from settings import DEFAULT_QUERY
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
-import plotly.express as px
 
 st.set_page_config(
     page_title=APP_NAME,
@@ -67,8 +67,18 @@ def main() -> None:
     if len(metadata_display) > 0:
         st.dataframe(metadata_display, height=700)
 
+    _MIN_YEAR, _MAX_YEAR = metadata[MetadataWithPositions.year].min(), metadata[MetadataWithPositions.year].max()
+
+    min_year_selected, max_year_selected = st.slider(
+        "Years", value=(_MIN_YEAR, _MAX_YEAR), min_value=_MIN_YEAR, max_value=_MAX_YEAR)
+
+    metadata_carto = metadata[
+        (metadata[MetadataWithScore.year] >= min_year_selected) &
+        (metadata[MetadataWithScore.year] <= max_year_selected)
+    ]
+
     fig = px.scatter(
-        data_frame=metadata,
+        data_frame=metadata_carto,
         x=MetadataWithScore.x,
         y=MetadataWithScore.y,
         opacity=0.5,
@@ -76,7 +86,7 @@ def main() -> None:
                     MetadataWithScore.score: False,
                     MetadataWithPositions.x: False,
                     MetadataWithPositions.y: False},
-    height=800,
+        height=600,
     )
 
     fig.update_layout(
