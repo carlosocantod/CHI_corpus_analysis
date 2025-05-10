@@ -16,6 +16,7 @@ from settings import DEFAULT_QUERY
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
+import plotly.express as px
 
 st.set_page_config(
     page_title=APP_NAME,
@@ -49,6 +50,13 @@ def main() -> None:
     with c2:
         number_of_results = st.select_slider(label="Number of results for display", options=[10, 50, 100], value=50)
     model, embeddings, metadata = load_data()
+
+    _margins = 1.05
+    min_y, max_y = metadata[MetadataWithScore.y].min(), metadata[MetadataWithScore.y].max()
+    min_y, max_y = min_y*_margins, max_y*_margins
+    min_x, max_x = metadata[MetadataWithScore.x].min(), metadata[MetadataWithScore.x].max()
+    min_x, max_x = min_x*_margins, max_x * _margins
+
     input_text = st.text_input(label="input_text", value=DEFAULT_QUERY)
     input_embeddings = model.encode([input_text], show_progress_bar=False)
     similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=Embeddings.doi).to_numpy()).ravel()
@@ -58,6 +66,26 @@ def main() -> None:
     st.text(f"Number of results for this query above threshold {len(metadata_display)}")
     if len(metadata_display) > 0:
         st.dataframe(metadata_display, height=700)
+
+    fig = px.scatter(
+        data_frame=metadata,
+        x=MetadataWithScore.x,
+        y=MetadataWithScore.y,
+        opacity=0.5,
+        hover_data={MetadataWithScore.title: True,
+                    MetadataWithScore.score: False,
+                    MetadataWithPositions.x: False,
+                    MetadataWithPositions.y: False},
+    height=800,
+    )
+
+    fig.update_layout(
+        yaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), yaxis_title=None,
+        xaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), xaxis_title=None,
+        yaxis_range=[min_y, max_y],
+        xaxis_range=[min_x, max_x],
+    )
+    st.plotly_chart(figure_or_data=fig)
 
 
 if __name__ == "__main__":
