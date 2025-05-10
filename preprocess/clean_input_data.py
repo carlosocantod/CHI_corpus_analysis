@@ -32,6 +32,8 @@ def main() -> None:
         df_text.columns = [c.lower() for c in df_text.columns]
         # we need an abstract in our analysis
         df_text = df_text[~df_text[Metadata.abstract].isnull()]
+        # TODO: relaunch with clearner doi
+        #df_text[Metadata.doi] = df_text[Metadata.doi].str.lstrip('https://')
         Metadata.validate(df_text, inplace=True)
         df_text.to_parquet(PATH_CLEAN_CHI_METADATA, index=False)
 
