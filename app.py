@@ -8,11 +8,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 from settings import APP_NAME
 from settings import COL_COSINE_SIMILARITY
-from settings import COL_DOI
 from settings import DEFAULT_QUERY
 from settings import PATH_CLEAN_CHI_METADATA
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
+from data_models import Embeddings, Metadata, MetadataWithScore
 
 st.set_page_config(
     page_title=APP_NAME,
@@ -28,12 +28,8 @@ def load_data() -> tuple[SentenceTransformer, pd.DataFrame, pd.DataFrame]:
     :return: model, embeddings, metadata
     """
     model = SentenceTransformer(SBERT_MODEL_NAME)
-    embeddings = pd.read_csv(PATH_EMBEDDINGS)
-    metadata = pd.read_csv(PATH_CLEAN_CHI_METADATA)
-    # TODO: remove this drop once data final is available
-    metadata = metadata.drop(columns=["Abstract"])
-    # TODO: improve way of displaying int with st.dataframe
-    metadata["Year"] = metadata["Year"].astype(int).astype(str)
+    embeddings = pd.read_parquet(PATH_EMBEDDINGS)
+    metadata = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
     return model, embeddings, metadata
 
 
@@ -50,7 +46,7 @@ def main():
     model, embeddings, metadata = load_data()
     input_text = st.text_input(label="input_text", value=DEFAULT_QUERY)
     input_embeddings = model.encode([input_text], show_progress_bar=False)
-    similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=COL_DOI).to_numpy()).ravel()
+    similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=Embeddings.doi).to_numpy()).ravel()
     metadata[COL_COSINE_SIMILARITY] = similarity_scores
     metadata_display = metadata.sort_values(COL_COSINE_SIMILARITY, ascending=False, ignore_index=True)
     metadata_display = metadata_display[metadata_display[COL_COSINE_SIMILARITY] >= min_score].iloc[: number_of_results]

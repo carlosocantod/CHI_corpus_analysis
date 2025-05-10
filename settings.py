@@ -1,12 +1,10 @@
 from pathlib import Path
 
-PATH_DATA = Path.home() / "Downloads"
+PATH_DATA = Path.home() / "git_repos" / "CHI_corpus_analysis" / "data"
 PATH_RAW_CHI_METADATA = PATH_DATA / "CHI_raw.xls"
-PATH_CLEAN_CHI_METADATA = PATH_DATA / "CHI_filtered.csv"
-PATH_EMBEDDINGS = PATH_DATA / "embeddings.csv"
-COL_ABSTRACT = "Abstracts"
-COL_DOI = "DOI"
+PATH_CLEAN_CHI_METADATA = PATH_DATA / "CHI_filtered.parquet"
+PATH_EMBEDDINGS = PATH_DATA / "embeddings.parquet"
 COL_COSINE_SIMILARITY = "cosine_score"
-SBERT_MODEL_NAME = "sentence-transformers/all-MiniLM-L12-v2"
+SBERT_MODEL_NAME = "BAAI/bge-base-en-v1.5"
 DEFAULT_QUERY = "doctors in participatory design"
 APP_NAME = "CHI papers search engine"

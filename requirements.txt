@@ -5,4 +5,7 @@ sentence-transformers
 torch
 langchain_community
 langchain
+langchain_core
 pandas
+pandera
+
