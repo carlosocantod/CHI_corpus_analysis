@@ -3,16 +3,18 @@ Simple streamlit application for querying CHI papers database
 """
 import pandas as pd
 import streamlit as st
+from pandera import check_types
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from data_models import Embeddings
+from data_models import Metadata, MetadataWithScore
 from settings import APP_NAME
-from settings import COL_COSINE_SIMILARITY
 from settings import DEFAULT_QUERY
 from settings import PATH_CLEAN_CHI_METADATA
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
-from data_models import Embeddings, Metadata, MetadataWithScore
+from pandera.typing import DataFrame
 
 st.set_page_config(
     page_title=APP_NAME,
@@ -21,8 +23,10 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+
+@check_types()
 @st.cache_data()
-def load_data() -> tuple[SentenceTransformer, pd.DataFrame, pd.DataFrame]:
+def load_data() -> tuple[SentenceTransformer, DataFrame[Embeddings], DataFrame[Metadata]]:
     """
     Load heavy items only once then cache
     :return: model, embeddings, metadata
@@ -33,7 +37,7 @@ def load_data() -> tuple[SentenceTransformer, pd.DataFrame, pd.DataFrame]:
     return model, embeddings, metadata
 
 
-def main():
+def main() -> None:
     """
     Main running loop
     """
@@ -47,9 +51,9 @@ def main():
     input_text = st.text_input(label="input_text", value=DEFAULT_QUERY)
     input_embeddings = model.encode([input_text], show_progress_bar=False)
     similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=Embeddings.doi).to_numpy()).ravel()
-    metadata[COL_COSINE_SIMILARITY] = similarity_scores
-    metadata_display = metadata.sort_values(COL_COSINE_SIMILARITY, ascending=False, ignore_index=True)
-    metadata_display = metadata_display[metadata_display[COL_COSINE_SIMILARITY] >= min_score].iloc[: number_of_results]
+    metadata[MetadataWithScore.score] = similarity_scores
+    metadata_display = metadata.sort_values(MetadataWithScore.score, ascending=False, ignore_index=True)
+    metadata_display = metadata_display[metadata_display[MetadataWithScore.score] >= min_score].iloc[: number_of_results]
     st.text(f"Number of results for this query above threshold {len(metadata_display)}")
     if len(metadata_display) > 0:
         st.dataframe(metadata_display, height=700)

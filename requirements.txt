@@ -8,4 +8,5 @@ langchain
 langchain_core
 pandas
 pandera
-
+streamlit
+scikit-learn
