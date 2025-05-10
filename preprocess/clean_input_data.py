@@ -5,15 +5,15 @@ Created on Tue Dec 20 15:34:41 2022
 """
 import pandas as pd
 
-from CHI_corpus_analysis.settings import SBERT_MODEL_NAME
-from CHI_corpus_analysis.settings import PATH_CLEAN_CHI_METADATA
-from CHI_corpus_analysis.settings import COL_ABSTRACT
-from CHI_corpus_analysis.settings import COL_DOI
-from CHI_corpus_analysis.settings import PATH_EMBEDDINGS
-from CHI_corpus_analysis.settings import PATH_RAW_CHI_METADATA
+from settings import COL_ABSTRACT
+from settings import COL_DOI
+from settings import PATH_CLEAN_CHI_METADATA
+from settings import PATH_EMBEDDINGS
+from settings import PATH_RAW_CHI_METADATA
+from settings import SBERT_MODEL_NAME
 
 
-def main():
+def main() -> None:
     """
     Simple script to process raw CHI extract. remove nans, and compute embeddings
     :return:

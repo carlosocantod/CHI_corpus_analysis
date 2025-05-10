@@ -3,3 +3,6 @@ xlrd
 sentence-transformers
 # see https://pytorch.org/get-started/locally/
 torch
+langchain_community
+langchain
+pandas
