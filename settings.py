@@ -12,3 +12,5 @@ DEFAULT_QUERY = "doctors in participatory design"
 APP_NAME = "CHI papers search engine"
 CHROMA_DB_PATH = PATH_DATA / "chroma_db_vectors"
 CHROMA_COLLECTION_NAME = "chi_collection"
+
+DISTANCE_METRIC = "cosine"

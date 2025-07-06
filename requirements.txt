@@ -10,3 +10,4 @@ pandas
 pandera
 streamlit
 scikit-learn
+umap-learn

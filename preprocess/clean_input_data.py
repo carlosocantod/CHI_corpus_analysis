@@ -4,12 +4,13 @@ Created on Tue Dec 20 15:34:41 2022
 @author: carlos
 """
 import pandas as pd
-from pacmap import PaCMAP
 from sklearn.preprocessing import StandardScaler
+from umap import UMAP
 
 from data_models import Embeddings
 from data_models import Metadata
 from data_models import MetadataWithPositions
+from settings import DISTANCE_METRIC
 from settings import PATH_CLEAN_CHI_METADATA
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
@@ -50,17 +51,25 @@ def main() -> None:
         df_embeddings.to_parquet(PATH_EMBEDDINGS, index=False)
 
     if not PATH_EMBEDDINGS_10d.is_file():
+        print("performing dim reduction")
         df_embeddings = pd.read_parquet(PATH_EMBEDDINGS)
         df_text = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
 
         _input_embeddings_to_scale = StandardScaler().fit_transform(get_embeddings_from_dataframe(df_embeddings))
 
-        dim_reduction_cluster = PaCMAP(n_components=10, random_state=0)
+        dim_reduction_cluster = UMAP(
+            n_components=10,
+            random_state=0,
+            min_dist=0.001,
+            n_neighbors=10,
+            metric=DISTANCE_METRIC,
+        )
+
         embeddings_10d = pd.DataFrame(dim_reduction_cluster.fit_transform(X=_input_embeddings_to_scale))
         embeddings_10d[Embeddings.doi] = df_embeddings[Embeddings.doi]
         embeddings_10d.to_parquet(PATH_EMBEDDINGS_10d, index=False)
 
-        dim_reduction_visu = PaCMAP(n_components=2, random_state=0)
+        dim_reduction_visu = UMAP(n_components=2, random_state=0, min_dist=0.99, metric=DISTANCE_METRIC)
         df_text[[MetadataWithPositions.x, MetadataWithPositions.y]] = pd.DataFrame(
             dim_reduction_visu.fit_transform(X=get_embeddings_from_dataframe(embeddings_10d))
         )
