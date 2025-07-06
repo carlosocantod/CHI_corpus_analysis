@@ -48,3 +48,10 @@ class MetadataWithScore(MetadataWithCluster):
 
 class Embeddings(_DOI):
     numbers: float = CheckNameField(regex=True, alias=r'\d{1,3}')
+
+
+class TopWordsPositionsCluster(DataFrameBaseModel):
+    cluster: str = CheckNameField(unique=True)
+    top_words: str = CheckNameField()
+    x: float = CheckNameField()
+    y: float = CheckNameField()

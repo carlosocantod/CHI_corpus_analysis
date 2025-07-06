@@ -5,6 +5,8 @@ PATH_RAW_CHI_METADATA = PATH_DATA / "CHI_raw.xls"
 PATH_CLEAN_CHI_METADATA = PATH_DATA / "CHI_filtered.parquet"
 PATH_CLEAN_CHI_METADATA_POSITIONS = PATH_DATA / "CHI_metadata.parquet"
 PATH_CLEAN_CHI_METADATA_CLUSTERS = PATH_DATA / "CHI_metadata_clusters.parquet"
+PATH_CLEAN_CHI_CLUSTERS_TOP_WORDS = PATH_DATA / "CHI_cluster_top_words.parquet"
+
 PATH_EMBEDDINGS = PATH_DATA / "embeddings.parquet"
 PATH_EMBEDDINGS_10d = PATH_DATA / "embeddings_10d.parquet"
 SBERT_MODEL_NAME = "BAAI/bge-base-en-v1.5"
