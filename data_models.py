@@ -51,7 +51,12 @@ class Embeddings(_DOI):
 
 
 class TopWordsPositionsCluster(DataFrameBaseModel):
-    cluster: str = CheckNameField(unique=True)
+    cluster: str = CheckNameField()
     top_words: str = CheckNameField()
     x: float = CheckNameField()
     y: float = CheckNameField()
+
+
+class TopWordsPositionsClusterUnique(TopWordsPositionsCluster):
+    cluster: str = CheckNameField(unique=True)
+    counts: int = CheckNameField()

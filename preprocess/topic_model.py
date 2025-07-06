@@ -77,16 +77,20 @@ def main() -> None:
 
     # get metadata clusters
     top_words_cluster = list()
-    for label in set(labels):
+    for label in labels:
         top_words = "; ".join([x[0] for x in topic_model.get_topic(label)])
         top_words_cluster.append({TopWordsPositionsCluster.cluster: label, TopWordsPositionsCluster.top_words: top_words})
 
     top_words_cluster = pd.DataFrame(top_words_cluster)
+    top_words_cluster[TopWordsPositionsCluster.y] = df_metadata[MetadataWithCluster.y]
+    top_words_cluster[TopWordsPositionsCluster.x] = df_metadata[MetadataWithCluster.x]
+
+    """
     centroids_visu = df_metadata.groupby(
         MetadataWithCluster.cluster, as_index=False,
     ).agg({MetadataWithCluster.x: "median", MetadataWithCluster.y: "median"})
-    top_words_cluster = top_words_cluster.merge(
-        centroids_visu, on=MetadataWithCluster.cluster, how="inner", validate="1:1")
+    """
+
 
     # save output dataframes
     TopWordsPositionsCluster.validate(top_words_cluster)
