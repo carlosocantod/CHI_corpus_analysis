@@ -6,7 +6,7 @@ import streamlit as st
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_models import Embeddings
-from data_models import MetadataWithPositions
+from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
 from settings import APP_NAME
 from settings import DEFAULT_QUERY
@@ -48,7 +48,7 @@ def main() -> None:
     if len(metadata_display) > 0:
         st.dataframe(metadata_display, height=700)
 
-    _MIN_YEAR, _MAX_YEAR = metadata[MetadataWithPositions.year].min(), metadata[MetadataWithPositions.year].max()
+    _MIN_YEAR, _MAX_YEAR = metadata[MetadataWithCluster.year].min(), metadata[MetadataWithCluster.year].max()
 
     min_year_selected, max_year_selected = st.slider(
         "Years", value=(_MIN_YEAR, _MAX_YEAR), min_value=_MIN_YEAR, max_value=_MAX_YEAR)
@@ -57,16 +57,21 @@ def main() -> None:
         (metadata[MetadataWithScore.year] >= min_year_selected) &
         (metadata[MetadataWithScore.year] <= max_year_selected)
     ]
+    metadata_carto[MetadataWithScore.cluster] = metadata_carto[MetadataWithScore.cluster].astype(str)
+    opacity = (metadata_carto[MetadataWithScore.cluster] != "-1")*0.7 + 0.3
 
+    st.write(opacity)
     fig = px.scatter(
         data_frame=metadata_carto,
         x=MetadataWithScore.x,
         y=MetadataWithScore.y,
         opacity=0.5,
-        hover_data={MetadataWithScore.title: True,
+        color=MetadataWithScore.cluster,
+        color_discrete_sequence=px.colors.qualitative.Dark24,
+        hover_data={MetadataWithCluster.title: True,
                     MetadataWithScore.score: False,
-                    MetadataWithPositions.x: False,
-                    MetadataWithPositions.y: False},
+                    MetadataWithScore.x: False,
+                    MetadataWithScore.y: False},
         height=600,
     )
 

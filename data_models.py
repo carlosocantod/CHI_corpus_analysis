@@ -38,7 +38,11 @@ class MetadataWithPositions(Metadata):
     y: float = CheckNameField()
 
 
-class MetadataWithScore(MetadataWithPositions):
+class MetadataWithCluster(MetadataWithPositions):
+    cluster: str = CheckNameField()
+
+
+class MetadataWithScore(MetadataWithCluster):
     score: float = CheckNameField(le=-1.0, ge=1.0)
 
 
