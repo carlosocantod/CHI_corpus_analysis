@@ -74,7 +74,10 @@ if top_words_topic_display.shape[0]>1:
         size="counts",
         size_max=max(1, int(30*n_results_filtered/n_results)),
         color=TopWordsPositionsCluster.cluster,
-        hover_data={TopWordsPositionsCluster.top_words: True},
+        hover_data={TopWordsPositionsCluster.top_words: True,
+                    TopWordsPositionsCluster.x: False,
+                    TopWordsPositionsCluster.y: False,
+                    TopWordsPositionsCluster.counts: False},
         color_discrete_sequence=px.colors.qualitative.Dark24,
         height=500,
         opacity=0.8,
@@ -88,3 +91,5 @@ if top_words_topic_display.shape[0]>1:
     )
 
     st.plotly_chart(fig_centroids)
+
+    st.dataframe(top_words_topic_display[[TopWordsPositionsCluster.cluster, TopWordsPositionsCluster.top_words, TopWordsPositionsCluster.counts]], hide_index=True)

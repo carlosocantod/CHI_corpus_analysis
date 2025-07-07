@@ -20,43 +20,49 @@ min_score = 0.7
 
 
 input_text = st.text_input("Enter search query", value=DEFAULT_QUERY)
-input_embeddings = model.encode([input_text], show_progress_bar=False)
-similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=Embeddings.doi).to_numpy()).ravel()
-metadata[MetadataWithScore.score] = similarity_scores
+if input_text:
 
-metadata_display = metadata.sort_values(MetadataWithScore.score, ascending=False, ignore_index=True)
-metadata_display = metadata_display[metadata_display[MetadataWithScore.score] >= min_score]
+    input_embeddings = model.encode([input_text], show_progress_bar=False)
+    similarity_scores = cosine_similarity(input_embeddings, embeddings.drop(columns=Embeddings.doi).to_numpy()).ravel()
+    metadata[MetadataWithScore.score] = similarity_scores
 
-st.markdown(f"Number of results: **{len(metadata_display)}**")
+    metadata_display = metadata.sort_values(MetadataWithScore.score, ascending=False, ignore_index=True)
+    metadata_display = metadata_display[metadata_display[MetadataWithScore.score] >= min_score]
 
-# Parameters
-ITEMS_PER_PAGE = 10
-columns = st.columns(4)
-with columns[0]:
-    # Pagination controls
-    page = st.number_input(
-        "Page",
-        min_value=1,
-        max_value=math.ceil(len(metadata_display) / ITEMS_PER_PAGE),
-        step=1
-    )
+    st.markdown(f"Number of results: **{len(metadata_display)}**")
 
-# Filter data for current page
-start_idx = (page - 1) * ITEMS_PER_PAGE
-end_idx = start_idx + ITEMS_PER_PAGE
-page_data = metadata_display.iloc[start_idx:end_idx]
+    # Parameters
+    ITEMS_PER_PAGE = 5
+    columns = st.columns(4)
+    with columns[0]:
+        # Pagination controls
+        page = st.number_input(
+            "Page",
+            min_value=1,
+            max_value=math.ceil(len(metadata_display) / ITEMS_PER_PAGE),
+            step=1
+        )
 
-# Display each entry in markdown
-for _, row in page_data.iterrows():
-    st.markdown(f"""
-### 📄 {row[MetadataWithCluster.title]}
+    # Filter data for current page
+    start_idx = (page - 1) * ITEMS_PER_PAGE
+    end_idx = start_idx + ITEMS_PER_PAGE
+    page_data = metadata_display.iloc[start_idx:end_idx]
 
-**Year:** {row[MetadataWithCluster.year]}  
-**DOI:** [{row[MetadataWithCluster.doi]}](https://doi.org/{row[MetadataWithCluster.doi]})  
-**Scholar Link:** [View on Google Scholar]({row[MetadataWithCluster.scholar_link]})
+    # Display each entry in markdown
+    for _, row in page_data.iterrows():
+        st.markdown(f"""
+    ### 📄 {row[MetadataWithCluster.title]}
+    
+    **Year:** {row[MetadataWithCluster.year]}  
+    **Score:** {row["score"]:.3f}  
 
-**Abstract:**  
-{row[MetadataWithCluster.abstract]}
-
----
-""")
+    **DOI:** [{row[MetadataWithCluster.doi]}](https://doi.org/{row[MetadataWithCluster.doi]})  
+    **Scholar Link:** [View on Google Scholar]({row[MetadataWithCluster.scholar_link]})
+    
+    **Abstract:**  
+    {row[MetadataWithCluster.abstract]}
+    
+    ---
+    """)
+    st.markdown("## Metadata full results")
+    st.dataframe(metadata_display.drop(columns=[MetadataWithCluster.x, MetadataWithCluster.y]))
