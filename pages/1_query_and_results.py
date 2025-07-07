@@ -6,9 +6,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from data_models import Embeddings
 from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
+from home import embeddings
+from home import metadata
+from home import model
 from settings import APP_NAME
 from settings import DEFAULT_QUERY
-from setup_streamlit import load_data
 
 st.set_page_config(page_title=APP_NAME, page_icon="🏗️", layout="wide")
 
@@ -16,7 +18,6 @@ st.title(f"{APP_NAME} – Query & Results")
 
 min_score = 0.7
 
-model, embeddings, metadata, _ = load_data()
 
 input_text = st.text_input("Enter search query", value=DEFAULT_QUERY)
 input_embeddings = model.encode([input_text], show_progress_bar=False)
