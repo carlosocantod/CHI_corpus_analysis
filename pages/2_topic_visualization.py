@@ -6,10 +6,9 @@ from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
 from data_models import TopWordsCluster
 from data_models import TopWordsPositionsCluster
-from home import metadata
-from home import top_words_topic
+from app import metadata
+from app import top_words_topic
 from settings import APP_NAME
-
 
 st.set_page_config(page_title=APP_NAME, page_icon="🏗️", layout="wide")
 
@@ -67,6 +66,8 @@ top_words_topic_display = pd.merge(
     top_words_topic, centroids_visu, on=TopWordsPositionsCluster.cluster, how="inner"
 )
 if top_words_topic_display.shape[0]>1:
+    st.markdown("## Topic Cartography")
+
     fig_centroids = px.scatter(
         top_words_topic_display,
         x=TopWordsPositionsCluster.x,
@@ -91,5 +92,32 @@ if top_words_topic_display.shape[0]>1:
     )
 
     st.plotly_chart(fig_centroids)
+    st.markdown("## Documents Cartography")
 
-    st.dataframe(top_words_topic_display[[TopWordsPositionsCluster.cluster, TopWordsPositionsCluster.top_words, TopWordsPositionsCluster.counts]], hide_index=True)
+    fig = px.scatter(
+        data_frame=metadata_carto,
+        x=MetadataWithScore.x,
+        y=MetadataWithScore.y,
+        opacity=0.5,
+        color=MetadataWithScore.cluster,
+        color_discrete_sequence=px.colors.qualitative.Dark24,
+        hover_data={MetadataWithCluster.title: True,
+                    MetadataWithScore.x: False,
+                    MetadataWithScore.y: False},
+        height=600,
+    )
+
+    fig.update_layout(
+        yaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), yaxis_title=None,
+        xaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), xaxis_title=None,
+        yaxis_range=[min_y, max_y],
+        xaxis_range=[min_x, max_x],
+    )
+
+    st.plotly_chart(fig)
+    st.markdown("## Top words per topic")
+    st.dataframe(top_words_topic_display[
+                     [TopWordsPositionsCluster.cluster,
+                      TopWordsPositionsCluster.top_words,
+                      TopWordsPositionsCluster.counts,
+                      ]], hide_index=True)

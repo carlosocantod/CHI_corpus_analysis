@@ -6,9 +6,9 @@ from sklearn.metrics.pairwise import cosine_similarity
 from data_models import Embeddings
 from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
-from home import embeddings
-from home import metadata
-from home import model
+from app import embeddings
+from app import metadata
+from app import model
 from settings import APP_NAME
 from settings import DEFAULT_QUERY
 
