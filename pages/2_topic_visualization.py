@@ -1,8 +1,11 @@
-import streamlit as st
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 
-from data_models import MetadataWithScore, MetadataWithCluster, TopWordsCluster, TopWordsPositionsCluster
+from data_models import MetadataWithCluster
+from data_models import MetadataWithScore
+from data_models import TopWordsCluster
+from data_models import TopWordsPositionsCluster
 from setup_streamlit import load_data
 
 st.title("Topic Visualization")

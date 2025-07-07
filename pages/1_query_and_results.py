@@ -1,9 +1,10 @@
 import streamlit as st
-import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
 
-from data_models import Embeddings, MetadataWithScore
-from settings import APP_NAME, DEFAULT_QUERY
+from data_models import Embeddings
+from data_models import MetadataWithScore
+from settings import APP_NAME
+from settings import DEFAULT_QUERY
 from setup_streamlit import load_data
 
 st.title(f"{APP_NAME} – Query & Results")
