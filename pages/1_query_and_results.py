@@ -54,7 +54,7 @@ for _, row in page_data.iterrows():
 **Scholar Link:** [View on Google Scholar]({row[MetadataWithCluster.scholar_link]})
 
 **Abstract:**  
-{row['abstract']}
+{row[MetadataWithCluster.abstract]}
 
 ---
 """)

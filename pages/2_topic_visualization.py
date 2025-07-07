@@ -13,13 +13,21 @@ st.title("Topic Visualization")
 _, _, metadata, top_words_topic = load_data()
 
 _MIN_YEAR, _MAX_YEAR = metadata[MetadataWithCluster.year].min(), metadata[MetadataWithCluster.year].max()
-min_year_selected, max_year_selected = st.slider("Select Year Range", value=(_MIN_YEAR, _MAX_YEAR),
-                                                  min_value=_MIN_YEAR, max_value=_MAX_YEAR)
+min_year_selected, max_year_selected = st.slider(
+    "Select Year Range",
+    value=(_MIN_YEAR, _MAX_YEAR),
+    min_value=_MIN_YEAR,
+    max_value=_MAX_YEAR,
+)
+
+n_results = metadata.shape[0]
 
 metadata_carto = metadata[
     (metadata[MetadataWithScore.year] >= min_year_selected) &
     (metadata[MetadataWithScore.year] <= max_year_selected)
 ]
+
+n_results_filtered = metadata_carto.shape[0]
 
 metadata_carto[MetadataWithScore.cluster] = metadata_carto[MetadataWithScore.cluster].astype(str)
 metadata_carto = metadata_carto.sort_values(TopWordsCluster.cluster)
@@ -54,22 +62,25 @@ top_words_topic[TopWordsCluster.cluster] = top_words_topic[TopWordsCluster.clust
 top_words_topic_display = pd.merge(
     top_words_topic, centroids_visu, on=TopWordsPositionsCluster.cluster, how="inner"
 )
+if top_words_topic_display.shape[0]>1:
+    fig_centroids = px.scatter(
+        top_words_topic_display,
+        x=TopWordsPositionsCluster.x,
+        y=TopWordsPositionsCluster.y,
+        size="counts",
+        size_max=max(1, int(30*n_results_filtered/n_results)),
+        color=TopWordsPositionsCluster.cluster,
+        hover_data={TopWordsPositionsCluster.top_words: True},
+        color_discrete_sequence=px.colors.qualitative.Dark24,
+        height=500,
+        opacity=0.8,
+    )
 
-fig_centroids = px.scatter(
-    top_words_topic_display,
-    x=TopWordsPositionsCluster.x, y=TopWordsPositionsCluster.y,
-    size="counts", size_max=30,
-    color=TopWordsPositionsCluster.cluster,
-    hover_data={TopWordsPositionsCluster.top_words: True},
-    color_discrete_sequence=px.colors.qualitative.Dark24,
-    height=500,
-    opacity=0.8
-)
+    fig_centroids.update_layout(
+        xaxis_range=[min_x, max_x],
+        yaxis_range=[min_y, max_y],
+        xaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=False),
+    )
 
-fig_centroids.update_layout(
-    xaxis_range=[min_x, max_x], yaxis_range=[min_y, max_y],
-    xaxis=dict(showgrid=False), yaxis=dict(showgrid=False)
-)
-
-choice = st.radio("Choose graph type", ["Topic Centroids", "All Data"])
-st.plotly_chart(fig_centroids if choice == "Topic Centroids" else fig_all)
+    st.plotly_chart(fig_centroids)
