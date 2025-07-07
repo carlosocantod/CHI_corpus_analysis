@@ -1,13 +1,16 @@
 """
 Simple streamlit application for querying CHI papers database
 """
+import pandas as pd
 import plotly.express as px
 import streamlit as st
 from sklearn.metrics.pairwise import cosine_similarity
 
 from data_models import Embeddings
-from data_models import MetadataWithCluster, TopWordsPositionsCluster
+from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
+from data_models import TopWordsCluster
+from data_models import TopWordsPositionsCluster
 from settings import APP_NAME
 from settings import DEFAULT_QUERY
 from setup_streamlit import load_data
@@ -27,8 +30,8 @@ def main() -> None:
     st.title(APP_NAME)
     c1, c2, _ = st.columns((4, 4, 4))
     with c1:
-        min_score = st.number_input("Min similarity score", min_value=-1.0, max_value=1.0, value=0.4, step=0.05)
-    with c2:
+        min_score = 0.4 #st.number_input("Min similarity score", min_value=-1.0, max_value=1.0, value=0.4, step=0.05)
+    with c1:
         number_of_results = st.select_slider(label="Number of results for display", options=[10, 50, 100], value=50)
     model, embeddings, metadata, top_words_topic = load_data()
 
@@ -58,7 +61,7 @@ def main() -> None:
         (metadata[MetadataWithScore.year] <= max_year_selected)
     ]
     metadata_carto[MetadataWithScore.cluster] = metadata_carto[MetadataWithScore.cluster].astype(str)
-    metadata_carto = metadata_carto.sort_values(TopWordsPositionsCluster.cluster)
+    metadata_carto = metadata_carto.sort_values(TopWordsCluster.cluster)
     opacity = (metadata_carto[MetadataWithScore.cluster] != "-1")*0.7 + 0.3
 
     fig = px.scatter(
@@ -82,17 +85,24 @@ def main() -> None:
         xaxis_range=[min_x, max_x],
     )
 
-    top_words_topic[TopWordsPositionsCluster.cluster] = top_words_topic[TopWordsPositionsCluster.cluster].astype(str)
-    top_words_topic["counts"] = 1
-    centroids_visu = top_words_topic.groupby(
-        TopWordsPositionsCluster.cluster, as_index=False,
-    ).agg({TopWordsPositionsCluster.x: "median", TopWordsPositionsCluster.y: "median",
-           TopWordsPositionsCluster.top_words: "first", "counts": "count"}).sort_values(TopWordsPositionsCluster.cluster)
+    top_words_topic[TopWordsCluster.cluster] = top_words_topic[TopWordsCluster.cluster].astype(str)
+    metadata_carto["counts"] = 1
+
+    centroids_visu = metadata_carto.groupby(TopWordsPositionsCluster.cluster, as_index=False).agg({
+        TopWordsPositionsCluster.x: "median",
+        TopWordsPositionsCluster.y: "median",
+        "counts": "count",
+    }).sort_values(TopWordsPositionsCluster.cluster)
+
+    top_words_topic_display = pd.merge(
+        left=top_words_topic, right=centroids_visu, how="inner", on=TopWordsPositionsCluster.cluster,
+    )
+
     fig2 = px.scatter(
-        data_frame=centroids_visu,
+        data_frame=top_words_topic_display,
         x=TopWordsPositionsCluster.x,
         y=TopWordsPositionsCluster.y,
-        opacity=0.9,
+        opacity=0.8,
         color=TopWordsPositionsCluster.cluster,
         color_discrete_sequence=px.colors.qualitative.Dark24,
         hover_data={TopWordsPositionsCluster.top_words: True,
@@ -114,7 +124,6 @@ def main() -> None:
         st.plotly_chart(figure_or_data=fig2)
     else:
         st.plotly_chart(figure_or_data=fig)
-
 
 
 

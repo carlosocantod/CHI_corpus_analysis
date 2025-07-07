@@ -5,7 +5,7 @@ from pandera.typing import DataFrame
 from sentence_transformers import SentenceTransformer
 
 from data_models import Embeddings
-from data_models import MetadataWithCluster, TopWordsPositionsCluster
+from data_models import MetadataWithCluster, TopWordsCluster
 from settings import PATH_CLEAN_CHI_METADATA_CLUSTERS, PATH_CLEAN_CHI_CLUSTERS_TOP_WORDS
 from settings import PATH_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
@@ -13,7 +13,7 @@ from settings import SBERT_MODEL_NAME
 
 @check_types()
 @st.cache_data()
-def load_data() -> tuple[SentenceTransformer, DataFrame[Embeddings], DataFrame[MetadataWithCluster], DataFrame[TopWordsPositionsCluster]]:
+def load_data() -> tuple[SentenceTransformer, DataFrame[Embeddings], DataFrame[MetadataWithCluster], DataFrame[TopWordsCluster]]:
     """
     Load heavy items only once then cache
     :return: model, embeddings, metadata

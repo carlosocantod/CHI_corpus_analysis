@@ -12,7 +12,7 @@ from sentence_transformers import SentenceTransformer
 
 from data_models import Embeddings
 from data_models import MetadataWithCluster
-from data_models import MetadataWithPositions, TopWordsPositionsCluster
+from data_models import MetadataWithPositions, TopWordsCluster
 from settings import PATH_CLEAN_CHI_METADATA_CLUSTERS
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS_10d, PATH_CLEAN_CHI_CLUSTERS_TOP_WORDS
@@ -77,24 +77,16 @@ def main() -> None:
 
     # get metadata clusters
     top_words_cluster = list()
-    for label in labels:
+    for label in set(labels):
         top_words = "; ".join([x[0] for x in topic_model.get_topic(label)])
-        top_words_cluster.append({TopWordsPositionsCluster.cluster: label, TopWordsPositionsCluster.top_words: top_words})
+        top_words_cluster.append({TopWordsCluster.cluster: label, TopWordsCluster.top_words: top_words})
 
     top_words_cluster = pd.DataFrame(top_words_cluster)
-    top_words_cluster[TopWordsPositionsCluster.y] = df_metadata[MetadataWithCluster.y]
-    top_words_cluster[TopWordsPositionsCluster.x] = df_metadata[MetadataWithCluster.x]
-
-    """
-    centroids_visu = df_metadata.groupby(
-        MetadataWithCluster.cluster, as_index=False,
-    ).agg({MetadataWithCluster.x: "median", MetadataWithCluster.y: "median"})
-    """
-
 
     # save output dataframes
-    TopWordsPositionsCluster.validate(top_words_cluster)
+    TopWordsCluster.validate(top_words_cluster)
     top_words_cluster.to_parquet(path=PATH_CLEAN_CHI_CLUSTERS_TOP_WORDS)
+
     MetadataWithCluster.validate(df_metadata)
     df_metadata.to_parquet(path=PATH_CLEAN_CHI_METADATA_CLUSTERS)
 

@@ -50,13 +50,12 @@ class Embeddings(_DOI):
     numbers: float = CheckNameField(regex=True, alias=r'\d{1,3}')
 
 
-class TopWordsPositionsCluster(DataFrameBaseModel):
-    cluster: str = CheckNameField()
+class TopWordsCluster(DataFrameBaseModel):
+    cluster: str = CheckNameField(unique=True)
     top_words: str = CheckNameField()
+
+
+class TopWordsPositionsCluster(TopWordsCluster):
+    counts: int = CheckNameField()
     x: float = CheckNameField()
     y: float = CheckNameField()
-
-
-class TopWordsPositionsClusterUnique(TopWordsPositionsCluster):
-    cluster: str = CheckNameField(unique=True)
-    counts: int = CheckNameField()
