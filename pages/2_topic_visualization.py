@@ -6,8 +6,8 @@ from data_models import MetadataWithCluster
 from data_models import MetadataWithScore
 from data_models import TopWordsCluster
 from data_models import TopWordsPositionsCluster
-from app import metadata
-from app import top_words_topic
+from home import metadata
+from home import top_words_topic
 from settings import APP_NAME
 
 st.set_page_config(page_title=APP_NAME, page_icon="🏗️", layout="wide")
@@ -87,8 +87,8 @@ if top_words_topic_display.shape[0]>1:
     fig_centroids.update_layout(
         xaxis_range=[min_x, max_x],
         yaxis_range=[min_y, max_y],
-        xaxis=dict(showgrid=False),
-        yaxis=dict(showgrid=False),
+        yaxis=dict(showgrid=False, showticklabels=False, showline=False, zeroline=False), yaxis_title=None,
+        xaxis=dict(showgrid=False, showticklabels=False, showline=False, zeroline=False), xaxis_title=None,
     )
 
     st.plotly_chart(fig_centroids)
@@ -108,8 +108,8 @@ if top_words_topic_display.shape[0]>1:
     )
 
     fig.update_layout(
-        yaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), yaxis_title=None,
-        xaxis=dict(showgrid=False, showticklabels=True, showline=False, zeroline=False), xaxis_title=None,
+        yaxis=dict(showgrid=False, showticklabels=False, showline=False, zeroline=False), yaxis_title=None,
+        xaxis=dict(showgrid=False, showticklabels=False, showline=False, zeroline=False), xaxis_title=None,
         yaxis_range=[min_y, max_y],
         xaxis_range=[min_x, max_x],
     )
