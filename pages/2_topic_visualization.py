@@ -7,6 +7,9 @@ from data_models import MetadataWithScore
 from data_models import TopWordsCluster
 from data_models import TopWordsPositionsCluster
 from setup_streamlit import load_data
+from settings import APP_NAME
+
+st.set_page_config(page_title=APP_NAME, page_icon="🏗️", layout="wide")
 
 st.title("Topic Visualization")
 
