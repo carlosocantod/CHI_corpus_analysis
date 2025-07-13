@@ -1,23 +1,23 @@
-"""
-Created on Tue Dec 20 15:34:41 2022
-
-@author: carlos
-"""
 import pandas as pd
+from fastembed import SparseTextEmbedding
 from sklearn.preprocessing import StandardScaler
 from umap import UMAP
 
 from data_models import Embeddings
 from data_models import Metadata
 from data_models import MetadataWithPositions
+from data_models import SparseEmbeddings
 from settings import DISTANCE_METRIC
 from settings import PATH_CLEAN_CHI_METADATA
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
 from settings import PATH_EMBEDDINGS_10d
 from settings import PATH_RAW_CHI_METADATA
+from settings import PATH_SPARSE_EMBEDDINGS
 from settings import SBERT_MODEL_NAME
+from settings import SPARSE_MODEL_NAME
 from utils import get_embeddings_from_dataframe
+from utils import obtain_sparse_vectors
 
 
 def main() -> None:
@@ -75,6 +75,23 @@ def main() -> None:
         )
         MetadataWithPositions.validate(df_text, inplace=True)
         df_text.to_parquet(PATH_CLEAN_CHI_METADATA_POSITIONS, index=False)
+
+    if not PATH_SPARSE_EMBEDDINGS.is_file():
+        df_text = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
+
+        model_sparse = SparseTextEmbedding(model_name=SPARSE_MODEL_NAME)
+        sparse_vectors = obtain_sparse_vectors(
+            documents=df_text[MetadataWithPositions.abstract].tolist(),
+            model_sparse=model_sparse,
+            batch_size=3,
+        )
+        df_sparse = pd.DataFrame({
+            SparseEmbeddings.sparse_indices: [emb.indices for emb in sparse_vectors],
+            SparseEmbeddings.sparse_values: [emb.values for emb in sparse_vectors],
+            SparseEmbeddings.doi: df_text[Metadata.doi]
+        })
+
+        df_sparse.to_parquet(PATH_SPARSE_EMBEDDINGS)
 
 
 if __name__ == "__main__":

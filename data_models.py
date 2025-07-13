@@ -59,3 +59,8 @@ class TopWordsPositionsCluster(TopWordsCluster):
     counts: int = CheckNameField()
     x: float = CheckNameField()
     y: float = CheckNameField()
+
+
+class SparseEmbeddings(_DOI):
+    sparse_indices: str = CheckNameField()
+    sparse_values: str = CheckNameField()
