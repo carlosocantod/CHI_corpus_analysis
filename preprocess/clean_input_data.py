@@ -6,7 +6,7 @@ from umap import UMAP
 from data_models import Embeddings
 from data_models import Metadata
 from data_models import MetadataWithPositions
-from data_models import SparseEmbeddings
+from data_models import SparseEmbeddingsDataModel
 from settings import DISTANCE_METRIC
 from settings import PATH_CLEAN_CHI_METADATA
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
@@ -76,19 +76,19 @@ def main() -> None:
         MetadataWithPositions.validate(df_text, inplace=True)
         df_text.to_parquet(PATH_CLEAN_CHI_METADATA_POSITIONS, index=False)
 
-    if not PATH_SPARSE_EMBEDDINGS.is_file():
+    if PATH_SPARSE_EMBEDDINGS.is_file():
         df_text = pd.read_parquet(PATH_CLEAN_CHI_METADATA)
 
         model_sparse = SparseTextEmbedding(model_name=SPARSE_MODEL_NAME)
         sparse_vectors = obtain_sparse_vectors(
             documents=df_text[MetadataWithPositions.abstract].tolist(),
             model_sparse=model_sparse,
-            batch_size=3,
+            batch_size=32,
         )
         df_sparse = pd.DataFrame({
-            SparseEmbeddings.sparse_indices: [emb.indices for emb in sparse_vectors],
-            SparseEmbeddings.sparse_values: [emb.values for emb in sparse_vectors],
-            SparseEmbeddings.doi: df_text[Metadata.doi]
+            SparseEmbeddingsDataModel.sparse_indices: [emb.indices for emb in sparse_vectors],
+            SparseEmbeddingsDataModel.sparse_values: [emb.values for emb in sparse_vectors],
+            SparseEmbeddingsDataModel.doi: df_text[Metadata.doi]
         })
 
         df_sparse.to_parquet(PATH_SPARSE_EMBEDDINGS)

@@ -61,6 +61,6 @@ class TopWordsPositionsCluster(TopWordsCluster):
     y: float = CheckNameField()
 
 
-class SparseEmbeddings(_DOI):
+class SparseEmbeddingsDataModel(_DOI):
     sparse_indices: str = CheckNameField()
     sparse_values: str = CheckNameField()
