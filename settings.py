@@ -9,10 +9,17 @@ PATH_CLEAN_CHI_CLUSTERS_TOP_WORDS = PATH_DATA / "CHI_cluster_top_words.parquet"
 
 PATH_EMBEDDINGS = PATH_DATA / "embeddings.parquet"
 PATH_EMBEDDINGS_10d = PATH_DATA / "embeddings_10d.parquet"
+PATH_SPARSE_EMBEDDINGS = PATH_DATA / "sparse_embeddings.parquet"
+
+# why is v2 not supported?
+# ValueError: Model prithivida/Splade_PP_en_v2 is not supported in SparseTextEmbedding.Please check the supported models using `SparseTextEmbedding.list_supported_models()`
 SBERT_MODEL_NAME = "BAAI/bge-base-en-v1.5"
+SPARSE_MODEL_NAME = "prithivida/Splade_PP_en_v1"
+
 DEFAULT_QUERY = "doctors in participatory design"
 APP_NAME = "CHI papers search engine"
 CHROMA_DB_PATH = PATH_DATA / "chroma_db_vectors"
-CHROMA_COLLECTION_NAME = "chi_collection"
+QDRANT_DB_PATH = PATH_DATA / "qdrant_db_vectors"
+COLLECTION_NAME = "chi_collection"
 
 DISTANCE_METRIC = "cosine"
