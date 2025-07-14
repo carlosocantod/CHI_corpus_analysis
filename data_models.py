@@ -1,6 +1,18 @@
-from pandera import DataFrameModel
 from functools import partial
+
+from pandera import DataFrameModel
 from pandera import Field
+from sqlalchemy import Column
+from sqlalchemy import Float
+from sqlalchemy import Integer
+from sqlalchemy import MetaData
+from sqlalchemy import String
+from sqlalchemy.ext.declarative import declarative_base
+
+from settings import CLUSTER_TOP_WORDS_TABLE_NAME
+from settings import METADATA_TABLE_NAME
+
+Base = declarative_base()
 
 CheckNameField = partial(Field, check_name=True)
 NullableField = partial(CheckNameField, nullable=True)
@@ -64,3 +76,24 @@ class TopWordsPositionsCluster(TopWordsCluster):
 class SparseEmbeddingsDataModel(_DOI):
     sparse_indices: str = CheckNameField()
     sparse_values: str = CheckNameField()
+
+
+db_meta = MetaData()
+
+
+class MetadataDB(Base):
+    __tablename__ = METADATA_TABLE_NAME
+    doi = Column(String, primary_key=True)
+    title = Column(String)
+    abstract = Column(String)
+    cluster = Column(String)
+    year = Column(Integer)
+    x = Column(Float)
+    y = Column(Float)
+    scholar_link = Column(String)
+
+
+class ClusterWordsDB(Base):
+    __tablename__ = CLUSTER_TOP_WORDS_TABLE_NAME
+    cluster = Column(String, primary_key=True)
+    top_words = Column(String)
