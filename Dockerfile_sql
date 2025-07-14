@@ -1,0 +1,12 @@
+FROM python:3.11-slim
+
+# Install sqlite-web
+RUN pip install sqlite-web
+
+# Copy your SQLite DB into the image (optional)
+
+# Expose the web interface
+EXPOSE 8080
+
+# Command to run sqlite-web
+CMD ["sqlite-web", "--host=0.0.0.0", "--port=8080", "--read-only", "/data/mydb.sqlite"]
