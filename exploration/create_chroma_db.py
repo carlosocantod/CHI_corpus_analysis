@@ -5,7 +5,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 from data_models import Embeddings
 from data_models import MetadataWithPositions
-from settings import CHROMA_COLLECTION_NAME
+from settings import COLLECTION_NAME
 from settings import CHROMA_DB_PATH
 from settings import PATH_CLEAN_CHI_METADATA_POSITIONS
 from settings import PATH_EMBEDDINGS
@@ -26,7 +26,7 @@ def main() -> None:
         raise ValueError("Non consistent ids, metadata vs embeddings")
 
     chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH.__str__())
-    collection = chroma_client.create_collection(name=CHROMA_COLLECTION_NAME)
+    collection = chroma_client.create_collection(name=COLLECTION_NAME)
     collection.add(
         documents=df_metadata[MetadataWithPositions.abstract].tolist(),
         metadatas=df_metadata[[MetadataWithPositions.doi, MetadataWithPositions.year]].to_dict(orient="records"),
@@ -36,7 +36,7 @@ def main() -> None:
 
     # ----------------------------------- example on how to use with Langchain ----------------------------------------
     langchain_chroma_db = Chroma(client=chroma_client,
-                                 collection_name=CHROMA_COLLECTION_NAME,
+                                 collection_name=COLLECTION_NAME,
                                  embedding_function=HuggingFaceEmbeddings(model_name=SBERT_MODEL_NAME))
     # Perform a similarity search
     query = "climate change impact on agriculture"
