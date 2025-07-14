@@ -50,7 +50,14 @@ class MetadataWithPositions(Metadata):
     y: float = CheckNameField()
 
 
-class MetadataWithCluster(MetadataWithPositions):
+class ClusterPositions(DataFrameBaseModel):
+    x: float = CheckNameField()
+    y: float = CheckNameField()
+    cluster: str = CheckNameField()
+    doi: str = CheckNameField()
+
+
+class MetadataWithCluster(Metadata, ClusterPositions):
     cluster: str = CheckNameField()
 
 
